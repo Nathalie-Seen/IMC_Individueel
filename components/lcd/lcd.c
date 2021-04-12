@@ -15,10 +15,6 @@
 #include "esp32/rom/uart.h"
 #include "string.h"
 
-#include "lcd.h"
-#include "i2c-lcd1602.h"
-#include "smbus.h"
-
 #include "i2c-lcd1602.h"
 #include "lcd.h"
 #include "smbus.h"
@@ -44,11 +40,10 @@
 #define TOP_ROW_EYE             0
 #define BOTTOM_ROW_EYE          1
 
-i2c_lcd1602_info_t *lcd_info;
-char bottom_half;
-char top_half;
 char clear;
-char full;
+i2c_lcd1602_info_t *lcd_info;
+
+void create_costum_char();
 
 static void i2c_master_init(void)
 {
@@ -97,10 +92,14 @@ void setup_lcd()
     lcd_info = i2c_lcd1602_malloc();
     i2c_lcd1602_init(lcd_info, smbus_info, true, LCD_NUM_ROWS, LCD_NUM_COLUMNS, LCD_NUM_VIS_COLUMNS);
     i2c_lcd1602_set_backlight(lcd_info, true);
+
+    create_costum_char();
 }
 
 // from here on is the code for the individual assignment
 void write_char(int collum, int row, char character){
+    // _wait_for_user();
+    // i2c_lcd1602_home(lcd_info);
     i2c_lcd1602_move_cursor(lcd_info, collum, row);
     i2c_lcd1602_write_char(lcd_info, character);
 }
@@ -131,49 +130,7 @@ void create_costum_char(){
     i2c_lcd1602_define_char(lcd_info, 0, clear_a);
     i2c_lcd1602_define_char(lcd_info, 1, top_half_a);
     i2c_lcd1602_define_char(lcd_info, 2, bottom_half_a);
-
-    clear = I2C_LCD1602_INDEX_CUSTOM_0;
-    top_half = I2C_LCD1602_CHARACTER_CUSTOM_1;
-    bottom_half = I2C_LCD1602_CHARACTER_CUSTOM_2;
-    full = I2C_LCD1602_CHARACTER_BLOCK;
-
     
-}
-
-void write_mouth(){
-    _wait_for_user();
-    i2c_lcd1602_home(lcd_info);
-    write_char(6,TOP_ROW_MOUTH,bottom_half);
-    write_char(6,BOTTOM_ROW_MOUTH,top_half);
-    write_char(7,BOTTOM_ROW_MOUTH,full);
-    write_char(8,BOTTOM_ROW_MOUTH,full);
-    write_char(9,BOTTOM_ROW_MOUTH,full);
-    write_char(10,BOTTOM_ROW_MOUTH,full);
-    write_char(11,BOTTOM_ROW_MOUTH,full);
-    write_char(12,BOTTOM_ROW_MOUTH,full);
-    write_char(13,BOTTOM_ROW_MOUTH,top_half);
-    write_char(13,TOP_ROW_MOUTH,bottom_half);
-}
-
-void write_eye(){
-    write_char(4,TOP_ROW_EYE,full);
-    write_char(4,BOTTOM_ROW_EYE,full);
-    clear_cell(3,BOTTOM_ROW_EYE);
-    clear_cell(5,BOTTOM_ROW_EYE);
-
-    write_char(15,TOP_ROW_EYE,full);
-    write_char(15,BOTTOM_ROW_EYE,full);
-    clear_cell(14,BOTTOM_ROW_EYE);
-    clear_cell(16,BOTTOM_ROW_EYE);
-}
-
-void write_blink(){
-    clear_cell(4,TOP_ROW_EYE);
-    write_char(3,BOTTOM_ROW_EYE,full);
-    write_char(5,BOTTOM_ROW_EYE,full);
-
-    clear_cell(15,TOP_ROW_EYE);
-    write_char(14,BOTTOM_ROW_EYE,full);
-    write_char(16,BOTTOM_ROW_EYE,full);
+    clear = I2C_LCD1602_INDEX_CUSTOM_0;
 }
 

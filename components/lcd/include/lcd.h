@@ -4,11 +4,8 @@
 #ifndef LCD_H
 #define LCD_H
 void setup_lcd();
-void write_string_position(char text[], int x,int y);
 void clear_LCD();
-void create_costum_char();
-void write_mouth();
-void write_eye();
-void write_blink();
+void clear_cell(int collum, int row);
+void write_char(int collum, int row, char character);
 
 #endif

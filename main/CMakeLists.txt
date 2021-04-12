@@ -1,1 +1,4 @@
-idf_component_register(SRCS "app_main.c" INCLUDE_DIRS include)
+set(COMPONENT_SRCS "app_main.c .")
+set(COMPONENT_ADD_INCLUDEDIRS "include . ")
+
+register_component()
