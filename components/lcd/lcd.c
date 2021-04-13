@@ -1,26 +1,6 @@
-/**
- * @file lcd.c
- * @brief LCD driver
- */
 #include <stdio.h>
-#include <stdlib.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_system.h"
-#include "driver/gpio.h"
-#include "driver/i2c.h"
-#include "esp_log.h"
-#include "sdkconfig.h"
-#include "esp32/rom/uart.h"
-#include "string.h"
-
 #include "i2c-lcd1602.h"
-#include "lcd.h"
 #include "smbus.h"
-#include "esp_sntp.h"
-
-
 
 #define TAG "lcd"
 #undef USE_STDIN
@@ -40,6 +20,7 @@ i2c_lcd1602_info_t *lcd_info;
 
 void create_costum_char();
 
+//initialize the 12c master
 static void i2c_master_init(void)
 {
     int i2c_master_port = I2C_MASTER_NUM;
@@ -58,14 +39,17 @@ static void i2c_master_init(void)
 
 void setup_lcd()
 {
+    //initialize the i2c master
     i2c_master_init();
     i2c_port_t i2c_num = I2C_MASTER_NUM;
     uint8_t address = 0x27;
 
+    //initialize the smbus
     smbus_info_t * smbus_info = smbus_malloc();
     smbus_init(smbus_info, i2c_num, address);
     smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS);
 
+    // set the info of the used lcd
     lcd_info = i2c_lcd1602_malloc();
     i2c_lcd1602_init(lcd_info, smbus_info, true, LCD_NUM_ROWS, LCD_NUM_COLUMNS, LCD_NUM_VIS_COLUMNS);
     i2c_lcd1602_set_backlight(lcd_info, true);
@@ -74,37 +58,46 @@ void setup_lcd()
 }
 
 void write_char(int collum, int row, char character){
+    //set the cursor on the right cell
     i2c_lcd1602_move_cursor(lcd_info, collum, row);
+    //write the given char
     i2c_lcd1602_write_char(lcd_info, character);
 }
 
+//clears the whole LCD
 void clear_LCD(){
         i2c_lcd1602_clear(lcd_info); 
 }
 
+//clears the given cell
 void clear_cell(int collum, int row){
     write_char(collum, row, clear);
 }
 
 
 void create_costum_char(){
+    //creates a costum char where nothing is active
     const unsigned char clear_a[8] = {
 	0b00000,0b00000,0b00000,0b00000,
 	0b00000,0b00000,0b00000,0b00000
     };
+    i2c_lcd1602_define_char(lcd_info, 0, clear_a);
+
+    //creates a costum char where the top half of the cell active is
     const unsigned char top_half_a[8] = {
 	0b11111,0b11111,0b11111,0b11111,
 	0b00000,0b00000,0b00000,0b00000
     };
-   const unsigned char bottom_half_a[8] = {
+    i2c_lcd1602_define_char(lcd_info, 1, top_half_a);
+
+    //creates a costum char where the bottom half of the cell active is
+    const unsigned char bottom_half_a[8] = {
 	0b00000,0b00000,0b00000,0b00000,
 	0b11111,0b11111,0b11111,0b11111
     };
-    
-    i2c_lcd1602_define_char(lcd_info, 0, clear_a);
-    i2c_lcd1602_define_char(lcd_info, 1, top_half_a);
     i2c_lcd1602_define_char(lcd_info, 2, bottom_half_a);
     
+    //set the char clear to the costom char with index 0
     clear = I2C_LCD1602_INDEX_CUSTOM_0;
 }
 
