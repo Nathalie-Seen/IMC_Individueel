@@ -44,7 +44,6 @@ void write_mouth(){
             clear_cell(mouth_columns[i],TOP_ROW_MOUTH);
         }
 
-
     switch(feeling){
         case Neutral:
         //mouth of happy and neutral are the same
