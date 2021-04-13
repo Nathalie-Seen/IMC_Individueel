@@ -5,7 +5,7 @@
 
 void app_main(void)
 {
-  
     initialize_touchpad();
     setup_lcd();
+    set_face();
 }

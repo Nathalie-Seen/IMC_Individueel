@@ -88,6 +88,10 @@ void clear_cell(int collum, int row){
 
 
 void create_costum_char(){
+    const unsigned char clear_a[8] = {
+	0b00000,0b00000,0b00000,0b00000,
+	0b00000,0b00000,0b00000,0b00000
+    };
     const unsigned char top_half_a[8] = {
 	0b11111,0b11111,0b11111,0b11111,
 	0b00000,0b00000,0b00000,0b00000
@@ -96,10 +100,7 @@ void create_costum_char(){
 	0b00000,0b00000,0b00000,0b00000,
 	0b11111,0b11111,0b11111,0b11111
     };
- const unsigned char clear_a[8] = {
-	0b00000,0b00000,0b00000,0b00000,
-	0b00000,0b00000,0b00000,0b00000
-    };
+    
     i2c_lcd1602_define_char(lcd_info, 0, clear_a);
     i2c_lcd1602_define_char(lcd_info, 1, top_half_a);
     i2c_lcd1602_define_char(lcd_info, 2, bottom_half_a);
