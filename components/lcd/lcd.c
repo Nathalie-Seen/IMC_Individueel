@@ -35,11 +35,6 @@
 #define LCD_NUM_COLUMNS			 40
 #define LCD_NUM_VIS_COLUMNS		 20
 
-#define TOP_ROW_MOUTH           2
-#define BOTTOM_ROW_MOUTH        3
-#define TOP_ROW_EYE             0
-#define BOTTOM_ROW_EYE          1
-
 char clear;
 i2c_lcd1602_info_t *lcd_info;
 
@@ -61,24 +56,6 @@ static void i2c_master_init(void)
                        I2C_MASTER_TX_BUF_LEN, 0);
 }
 
-static uint8_t _wait_for_user(void)
-{
-    uint8_t c = 0;
-#ifdef USE_STDIN
-    while (!c)
-    {
-       STATUS s = uart_rx_one_char(&c);
-       if (s == OK) {
-          printf("%c", c);
-       }
-    }
-#else
-    vTaskDelay(1000 / portTICK_RATE_MS);
-#endif
-    return c;
-}
-
-//Setup for LCD
 void setup_lcd()
 {
     i2c_master_init();
@@ -96,19 +73,15 @@ void setup_lcd()
     create_costum_char();
 }
 
-// from here on is the code for the individual assignment
 void write_char(int collum, int row, char character){
-    // _wait_for_user();
-    // i2c_lcd1602_home(lcd_info);
     i2c_lcd1602_move_cursor(lcd_info, collum, row);
     i2c_lcd1602_write_char(lcd_info, character);
 }
 
-//Method to clear the LCD
 void clear_LCD(){
         i2c_lcd1602_clear(lcd_info); 
 }
-//clear a cell at the given place
+
 void clear_cell(int collum, int row){
     write_char(collum, row, clear);
 }

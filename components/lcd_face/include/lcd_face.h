@@ -4,5 +4,6 @@
 #ifndef LCD_FACE_H
 #define LCD_FACE_H
 void set_initial_face();
+void clear_face();
 
 #endif

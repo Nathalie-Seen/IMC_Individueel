@@ -11,9 +11,9 @@
 #define BOTTOM_ROW_MOUTH        3
 #define TOP_ROW_EYE             0
 #define BOTTOM_ROW_EYE          1
-char bottom_half;
-char top_half;
-char full;
+
+char bottom_half, top_half, full;
+int can_blink;
 
 
 TimerHandle_t timer_blink;
@@ -64,9 +64,16 @@ void timer_blink_callback( TimerHandle_t xTimer ){
 	sprintf(&strftime_buf[0], "%02d:%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 	size_t timeSize = strlen(strftime_buf);
 	for (int i = 0; i < timeSize; i++) {
+        if(can_blink){
 		write_blink();
         write_eye();
+        }
 	}
+}
+
+void clear_face(){
+    clear_LCD();
+    can_blink = 0;
 }
 
 void set_initial_face(){
@@ -77,6 +84,7 @@ void set_initial_face(){
 
     write_mouth();
     write_eye();
+    can_blink = 1;
 
     int id = 1;
 	timer_blink = xTimerCreate("Blink", pdMS_TO_TICKS(10000), pdTRUE, ( void * )id, &timer_blink_callback);
