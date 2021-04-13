@@ -1,3 +1,9 @@
+/**
+ * this project is based of the initialization and activation of the touchpad.
+ * i didnt make most of the method initialize_touchpad, i wrote the code after  the line of initialize_face();
+ * the method input_key_service_cb also isnt selfmade, but the timer and the actions in the switch case are.
+ * */
+
 #include <string.h>
 #include <sys/time.h>
 #include "esp_peripherals.h"
@@ -6,8 +12,11 @@
 #include "lcd_face.h"
 #include "generic.h"
 
+#define TAG "touchpad"
+
 TimerHandle_t timer_neutral;
 
+//set emotion to neutral and set the face accordingly
 void timer_neutral_callback( TimerHandle_t xTimer ){ 
 	size_t timeSize = 10;
 	for (int i = 0; i < timeSize; i++) {
@@ -21,10 +30,11 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
     audio_board_handle_t board_handle = (audio_board_handle_t) ctx;
     int player_volume;
     audio_hal_get_volume(board_handle->audio_hal, &player_volume);
-
     if (evt->type == INPUT_KEY_SERVICE_ACTION_CLICK_RELEASE) {
+
+        //resets timer when a button is pressed
         if(xTimerReset(timer_neutral, 10) != pdPASS){
-            ESP_LOGE("touchpad", "Cannot restart 25 second timer");
+            ESP_LOGE(TAG, "Cannot reset 25 second timer");
         }
 
         switch ((int)evt->data) {
@@ -45,17 +55,17 @@ static esp_err_t input_key_service_cb(periph_service_handle_t handle, periph_ser
 			}
             case INPUT_KEY_USER_ID_VOLDOWN:
 			{
+                //this touchpad doesnt work
                 break;
 			}
         }
     }
-
+    //always set the face
     set_face();
     return ESP_OK;
 }
 
 void initialize_touchpad(){
-
     esp_periph_config_t periph_cfg = DEFAULT_ESP_PERIPH_SET_CONFIG();
     esp_periph_set_handle_t set = esp_periph_set_init(&periph_cfg);
 
@@ -75,9 +85,10 @@ void initialize_touchpad(){
     initialize_face();
     
     int id = 0;
+    //set timer for 25 seconds and call timer_neutral_caalback
     timer_neutral = xTimerCreate("Neutral", pdMS_TO_TICKS(25000), pdTRUE, ( void * )id, &timer_neutral_callback);
     if( xTimerStart(timer_neutral, 10 ) != pdPASS ) {
-		ESP_LOGE("touchpad", "Cannot start 25 second timer");
+		ESP_LOGE(TAG, "Cannot start 25 second timer");
     }
 
 }

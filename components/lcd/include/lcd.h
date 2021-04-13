@@ -1,6 +1,3 @@
-#include "i2c-lcd1602.h"
-#include "smbus.h"
-
 #ifndef LCD_H
 #define LCD_H
 void setup_lcd();
